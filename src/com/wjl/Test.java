@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Test {
-    //创建线程安全的数组列表
-    private ArrayList<News> newsList = (ArrayList<News>) java.util.Collections.synchronizedList(new ArrayList<News>());
+    private ArrayList<News> newsList = new ArrayList<News>();
 
-    static final String HOST = "http://www.hzpt.edu.cn/";
+    private static final String HOST = "http://www.hzpt.edu.cn/";
 
-    static int index = 1;
+    private static int index = 1;
+
+    private String refreshTime;
+
+    private boolean flag;
 
     /**
      * 这个方法是用来获取当前页面的Document对象
@@ -22,17 +25,21 @@ public class Test {
      * 将判断还有没有下一页，有的话继续获取下一页的Document对象
      */
     public void traversalDirectory(String url) throws IOException {//遍历目录
+        flag = false;
         if(url==null){url="http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1";}//
         Document doc = Jsoup.connect(url).get();
         getPageDate(doc);//这一步已经当前页页面的数据存储到newsList中
 
         Elements nextPage = doc.select("a:matches(下一页)");
         Elements lastPage = doc.select("a:matches(尾页)");
-        if(nextPage.attr("href").equals(lastPage.attr("href"))){
+        if(/*nextPage.attr("href").equals(lastPage.attr("href"))*/index==3){
             String nowDate = new MyCollections().getDate();
             System.out.println(nowDate + "：已经遍历完成");
+            refreshTime = new MyCollections().getDate();
+            flag = true;
         }else{
             traversalDirectory("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=" + index++);
+            System.out.println("已经访问了目录的第"+(index-1)+"页");
         }
     }
 
@@ -85,5 +92,13 @@ public class Test {
 
     public ArrayList<News> getNewsList(){
         return newsList;
+    }
+
+    public String getRefreshTime() {
+        return refreshTime;
+    }
+
+    public boolean isFlag() {
+        return flag;
     }
 }

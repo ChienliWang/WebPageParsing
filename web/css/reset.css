@@ -1,0 +1,13 @@
+*{
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+body,div,ul,li,p,b,span{margin: 0;padding: 0;border: 0;}
+li{list-style: none;}
+img{display: block;}
+a{text-align: center;text-decoration: none;}
+a:hover{text-decoration: none;}
+.left{display: inline;float: left;}
+.right{display: inline;float: right;}
+.clr{clear:both;visibility: hidden;}
