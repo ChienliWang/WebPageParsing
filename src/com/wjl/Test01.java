@@ -14,10 +14,10 @@ public class Test01 {
 
     ArrayList<String> titleList = new ArrayList<String>();
     ArrayList<String> urlList = new ArrayList<String>();
-    static final String host = "http://www.hzpt.edu.cn/";
+    static final String host = "http://www.hzpt.edu.cn";
 
     public static void main(String[] args) throws IOException{
-        new Test01().mothed02();
+        new Test01().method03();
     }
 
     /**
@@ -93,5 +93,23 @@ public class Test01 {
         }
     }
 
+    private void method03() throws IOException {
+        Document doc = Jsoup.connect("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1").get();
+        //通过URL地址获取对应的文本内容
+        String url = "http://www.hzpt.edu.cn/Newsdetail.php?id=31345";
+        Document doc1 = Jsoup.connect(url).get();
+        Elements t1 = doc1.select("table [width=710] tbody tr:eq(3) td p span span");
+        Elements t2 = doc1.select("table [width=710] tbody tr:eq(3) td p span span img[src$=.jpg]");
+        for (Element e : t1){
+            String imgURL = e.select("img").attr("src");
+            e.select("img").attr("src","imgURL:"+host+imgURL);
+            imgURL = e.select("img").attr("src");
+            e.select("img").remove();
+            e.select("br").remove();
+            e.append(imgURL+"<br>");
+            System.out.println(e.html());
+        }
+
+    }
 
 }

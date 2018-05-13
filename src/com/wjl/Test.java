@@ -30,7 +30,7 @@ public class Test {
      * 将判断还有没有下一页，有的话继续获取下一页的Document对象
      */
     public void traversalDirectory(String url) throws IOException {//遍历目录
-        if(url==null){url="http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1";}//
+        if(url==null){url="http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page="+ index ;}//
         Document doc = Jsoup.connect(url).get();
         getPageDate(doc);//这一步已经当前页页面的数据存储到newsList中
 
@@ -41,8 +41,8 @@ public class Test {
             System.out.println(nowDate + "：已经遍历完成");
             flag = true;
         }else{
-            traversalDirectory("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=" + index++);
-            System.out.println("已经访问了目录的第"+(index-1)+"页");
+            System.out.println("已经访问了目录的第"+ index++ +"页");
+            traversalDirectory("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=" + index);
         }
     }
 
@@ -89,7 +89,11 @@ public class Test {
         Elements text = doc.select("table [width=710] tbody tr:eq(3) td p span span");
         for (Element e : text){//为图片的src属性添加HOST
             String imgURL = e.select("img").attr("src");
-            e.select("img").attr("src",HOST + imgURL);
+            e.select("img").attr("src","imgURL:"+HOST+imgURL);
+            imgURL = e.select("img").attr("src");
+            e.select("img").remove();
+            e.select("br").remove();
+            e.append(imgURL+"<br>");
         }
         return text.html();
     }//getPageTextByURL over
