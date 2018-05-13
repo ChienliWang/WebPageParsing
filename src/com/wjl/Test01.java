@@ -17,7 +17,7 @@ public class Test01 {
     static final String host = "http://www.hzpt.edu.cn/";
 
     public static void main(String[] args) throws IOException{
-        new Test01().mothed();
+        new Test01().mothed02();
     }
 
     /**
@@ -30,21 +30,21 @@ public class Test01 {
         Document doc = Jsoup.connect("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1").get();
 
         //获取对应的a标签对象
-        Elements a1 = doc.select("table.xx tr:eq(0) td:eq(1) a");
+        //Elements a1 = doc.select("table.xx tr:eq(0) td:eq(1) a");
         //System.out.println(a1.toString());
 
         //判断是否是最后一页
-        Elements a2 = doc.select("a:matches(下一页)");
-        Elements a3 = doc.select("a:matches(尾页)");
-        System.out.println(a2.attr("href"));
-        System.out.println(a2);
+        //Elements a2 = doc.select("a:matches(下一页)");
+        //Elements a3 = doc.select("a:matches(尾页)");
+        //System.out.println(a2.attr("href"));
+        //System.out.println(a2);
         
-        int index = 1;
-        System.out.println(index++);
-        System.out.println(++index);
+        //int index = 1;
+        //System.out.println(index++);
+        //System.out.println(++index);
 
         //获取对应标题的发生时间
-        Elements a4 = doc.select("table.xx tr:eq(0) td:eq(2) span");
+        //Elements a4 = doc.select("table.xx tr:eq(0) td:eq(2) span");
         //System.out.println(a4.html());
 
         //通过URL地址获取对应的文本内容
@@ -53,7 +53,9 @@ public class Test01 {
         Elements t1 = doc1.select("table [width=710] tbody tr:eq(3) td p span span");
         Elements t2 = doc1.select("table [width=710] tbody tr:eq(3) td p span span img[src$=.jpg]");
         for (Element e : t1){
-            //System.out.println(e.html());
+            String imgURL = e.select("img").attr("src");
+            e.select("img").attr("src",host+imgURL);
+            System.out.println(e.html());
         }
 
     }
@@ -73,6 +75,22 @@ public class Test01 {
             System.out.print(e.select("td span").html()+"\r\n");//时间
         }
         //System.out.println(e1);
+    }
+    private void mothed02() throws IOException {
+        Document doc = Jsoup.connect("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1").get();
+        //缩小范围到目录的范围
+        Elements directory = doc.select("table.xx tr");//directory（目录）
+        //遍历
+        for (Element e : directory) {
+            String title, url, date;
+            title = e.select("td a").html();
+            //获得标题
+            url = host + e.select("td a").attr("href");
+            //获得URL
+            date = e.select("td span").html();
+            //获得日期
+            System.out.println(title+"\t"+url+"\t"+date);
+        }
     }
 
 

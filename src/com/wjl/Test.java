@@ -14,28 +14,31 @@ public class Test {
     private static final String HOST = "http://www.hzpt.edu.cn/";
 
     private static int index = 1;
+    private boolean flag = false;
 
-    private String refreshTime;
-
-    private boolean flag;
-
+    public ArrayList<News> accessNewsList() throws IOException {
+        if(!flag){
+            traversalDirectory("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1");
+            return newsList;
+        }else {
+            return newsList;
+        }
+    }
     /**
      * 这个方法是用来获取当前页面的Document对象
      * 并调用getPageDate方法存储数据，在数据存储完成之后
      * 将判断还有没有下一页，有的话继续获取下一页的Document对象
      */
     public void traversalDirectory(String url) throws IOException {//遍历目录
-        flag = false;
         if(url==null){url="http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=1";}//
         Document doc = Jsoup.connect(url).get();
         getPageDate(doc);//这一步已经当前页页面的数据存储到newsList中
 
         Elements nextPage = doc.select("a:matches(下一页)");
         Elements lastPage = doc.select("a:matches(尾页)");
-        if(/*nextPage.attr("href").equals(lastPage.attr("href"))*/index==3){
+        if(nextPage.attr("href").equals(lastPage.attr("href"))){
             String nowDate = new MyCollections().getDate();
             System.out.println(nowDate + "：已经遍历完成");
-            refreshTime = new MyCollections().getDate();
             flag = true;
         }else{
             traversalDirectory("http://www.hzpt.edu.cn/Newslist.php?pernums=0&cid=315&page=" + index++);
@@ -51,28 +54,25 @@ public class Test {
      * @throws IOException
      * @param doc
      */
-    public void getPageDate(Document doc) throws IOException {
-        for (int i=0; i<12; i++){
-            //缩小范围到目录的范围
-            Elements directory = doc.select("table.xx tr");//directory（目录）
-            //遍历
-            for (Element e : directory){
-                String title, url, date, text;
-                title = e.select("td a").html();
-                //获得标题
-                url = HOST + e.select("td a").attr("href");
-                //获得URL
-                date = e.select("td span").html();
-                //获得日期
-                text = getPageTextByURL(url);
-                //获得文本内容
-
-                News news = new News(title, url, date, text);
-                //将该文本存储到类中
-                newsList.add(news);
-                //将新建的类存储到newsList中
-            }//foreach over
-        }//for over
+    private void getPageDate(Document doc) throws IOException {
+        //缩小范围到目录的范围
+        Elements directory = doc.select("table.xx tr");//directory（目录）
+        //遍历
+        for (Element e : directory){
+            String title, url, date, text;
+            title = e.select("td a").html();
+            //获得标题
+            url = HOST + e.select("td a").attr("href");
+            //获得URL
+            date = e.select("td span").html();
+            //获得日期
+            text = getPageTextByURL(url);
+            //获得文本内容
+            News news = new News(title, url, date, text);
+            //将该文本存储到类中
+            newsList.add(news);
+            //将新建的类存储到newsList中
+        }//foreach over
     }//getPageDate over
 
     /**
@@ -84,21 +84,13 @@ public class Test {
      * 片
      * @param url
      */
-    public String getPageTextByURL(String url) throws IOException {
+    private String getPageTextByURL(String url) throws IOException {
         Document doc = Jsoup.connect(url).get();
         Elements text = doc.select("table [width=710] tbody tr:eq(3) td p span span");
+        for (Element e : text){//为图片的src属性添加HOST
+            String imgURL = e.select("img").attr("src");
+            e.select("img").attr("src",HOST + imgURL);
+        }
         return text.html();
     }//getPageTextByURL over
-
-    public ArrayList<News> getNewsList(){
-        return newsList;
-    }
-
-    public String getRefreshTime() {
-        return refreshTime;
-    }
-
-    public boolean isFlag() {
-        return flag;
-    }
 }
